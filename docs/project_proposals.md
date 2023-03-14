@@ -2,7 +2,7 @@
 jupytext:
   text_representation:
     extension: .md
-    format_name: myst
+    format_name: markdown
     format_version: 0.13
     jupytext_version: 1.14.5
 ---
@@ -11,8 +11,6 @@ jupytext:
 
 
 ## Jill:
-
-
 
 * Title: Satellite detection of atmospheric rivers
 * AR definition:  width&lt; 1000 km, length> 2000 km, precipitable water > 2 cm, east-west orientation
@@ -27,25 +25,28 @@ jupytext:
         [https://automaticaddison.com/how-to-determine-the-orientation-of-an-object-using-opencv/](https://automaticaddison.com/how-to-determine-the-orientation-of-an-object-using-opencv/)
         
     * Data: GOES 17/18 (GOES West) total precipitable water
+      * goes2go package
+        * https://blaylockbk.github.io/goes2go/_build/html/user_guide/notebooks/field-of-view_ABI.html
+      * using stac catalob
+        * https://gist.github.com/scottyhq/f8af457488050d8de369da9733acb4e7
+      * GOES 18 total precipitable water (moved to GOES west on Jan. 4, 2023)
+        * https://www.nesdis.noaa.gov/news/earth-orbit-noaas-goes-18-now-goes-west
+        * https://noaa-goes18.s3.amazonaws.com/index.html#ABI-L2-TPWC/
+      * GOES 17  total precipitable water content (offline on Jan 4, 2023)
+        * https://noaa-goes16.s3.amazonaws.com/index.html#ABI-L2-TPWC/
 
-+++ {"user_expressions": []}
 
 ## Jamie:
-
-
 
 * Title: surface classification for Landsat/Sentinel images
 * Use some kind of machine learning technique to train a classifier, using the Corrine Land Cover dataset as ground truth
 * Dataset:  HLS tiles – how many?  Minimum size?  What band combinations?
 * Sanity check – k-means clustering with scikit learn in 3 dimensions?
 * Corrine user guide: [https://land.copernicus.eu/user-corner/technical-library/clc-product-user-manual](https://land.copernicus.eu/user-corner/technical-library/clc-product-user-manual)  
-* Classifier example:
+* Classifier example: https://ml-gis-service.com/index.php/2020/10/14/data-science-unsupervised-classification-of-satellite-images-with-k-means-algorithm/
 
-+++ {"user_expressions": []}
 
 ## Sonia
-
-
 
 * Title: ocean chlorophyll regional/temporal variability?
 * Dataset: [https://registry.opendata.aws/sentinel-3/](https://registry.opendata.aws/sentinel-3/) – olci instrument for ocean color
@@ -53,15 +54,12 @@ jupytext:
 * [https://sentinels.copernicus.eu/web/sentinel/technical-guides/sentinel-3-olci/level-2/ocean-processing](https://sentinels.copernicus.eu/web/sentinel/technical-guides/sentinel-3-olci/level-2/ocean-processing)
 * https://www.matecdev.com/posts/landsat-sentinel-aws-s3-python.html
 
-+++ {"user_expressions": []}
+
 
 ## Nick
 
-+++ {"user_expressions": []}
 
 ## Grace
-
-
 
 * Analyze vertical structure of hurricanes and how it relates to their intensity and other meteorological variables using Cloudsat
 * Cloudsat data archive: [https://cloudsat.atmos.colostate.edu/data](https://cloudsat.atmos.colostate.edu/data)
