@@ -20,20 +20,23 @@ jupytext:
     * Check shape/orientation
     * See if wind fields correlate?
     * References:  See folder
-    * Links: [https://pyimagesearch.com/2021/02/22/opencv-connected-component-labeling-and-analysis/](https://pyimagesearch.com/2021/02/22/opencv-connected-component-labeling-and-analysis/)
+    * Links: 
+      * [https://pyimagesearch.com/2021/02/22/opencv-connected-component-labeling-and-analysis/](https://pyimagesearch.com/2021/02/22/opencv-connected-component-labeling-and-analysis/)
 
-        [https://automaticaddison.com/how-to-determine-the-orientation-of-an-object-using-opencv/](https://automaticaddison.com/how-to-determine-the-orientation-of-an-object-using-opencv/)
+      * [https://automaticaddison.com/how-to-determine-the-orientation-of-an-object-using-opencv/](https://automaticaddison.com/how-to-determine-the-orientation-of-an-object-using-opencv/)
         
-    * Data: GOES 17/18 (GOES West) total precipitable water
-      * goes2go package
-        * https://blaylockbk.github.io/goes2go/_build/html/user_guide/notebooks/field-of-view_ABI.html
-      * using stac catalob
-        * https://gist.github.com/scottyhq/f8af457488050d8de369da9733acb4e7
-      * GOES 18 total precipitable water (moved to GOES west on Jan. 4, 2023)
-        * https://www.nesdis.noaa.gov/news/earth-orbit-noaas-goes-18-now-goes-west
-        * https://noaa-goes18.s3.amazonaws.com/index.html#ABI-L2-TPWC/
-      * GOES 17  total precipitable water content (offline on Jan 4, 2023)
-        * https://noaa-goes16.s3.amazonaws.com/index.html#ABI-L2-TPWC/
+* Data: GOES 17/18 (GOES West) total precipitable water
+  * goes2go package
+    * https://blaylockbk.github.io/goes2go/_build/html/user_guide/notebooks/field-of-view_ABI.html
+  * using stac catalog
+    * https://gist.github.com/scottyhq/f8af457488050d8de369da9733acb4e7
+  * GOES on AWS
+    * https://registry.opendata.aws/noaa-goes/
+    * GOES 18 total precipitable water (moved to GOES west on Jan. 4, 2023)
+      * https://www.nesdis.noaa.gov/news/earth-orbit-noaas-goes-18-now-goes-west
+      * https://noaa-goes18.s3.amazonaws.com/index.html#ABI-L2-TPWC/
+    * GOES 17  total precipitable water content (offline on Jan 4, 2023)
+      * https://noaa-goes16.s3.amazonaws.com/index.html#ABI-L2-TPWC/
 
 
 ## Jamie:
@@ -43,6 +46,7 @@ jupytext:
 * Dataset:  HLS tiles – how many?  Minimum size?  What band combinations?
 * Sanity check – k-means clustering with scikit learn in 3 dimensions?
 * Corrine user guide: [https://land.copernicus.eu/user-corner/technical-library/clc-product-user-manual](https://land.copernicus.eu/user-corner/technical-library/clc-product-user-manual)  
+* 10 meter global classification: https://registry.opendata.aws/io-lulc/
 * Classifier example: https://ml-gis-service.com/index.php/2020/10/14/data-science-unsupervised-classification-of-satellite-images-with-k-means-algorithm/
 
 
@@ -53,6 +57,11 @@ jupytext:
 * Compare sentinel and modis/aqua retrievals?
 * [https://sentinels.copernicus.eu/web/sentinel/technical-guides/sentinel-3-olci/level-2/ocean-processing](https://sentinels.copernicus.eu/web/sentinel/technical-guides/sentinel-3-olci/level-2/ocean-processing)
 * https://www.matecdev.com/posts/landsat-sentinel-aws-s3-python.html
+* NASA modis
+  * https://oceancolor.gsfc.nasa.gov/data/download_methods/
+  * https://github.com/OceanOptics/getOC
+* Algorithms:  https://oceancolor.gsfc.nasa.gov/atbd/
+  * 
 
 
 
