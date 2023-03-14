@@ -54,14 +54,18 @@ jupytext:
 
 * Title: ocean chlorophyll regional/temporal variability?
 * Dataset: [https://registry.opendata.aws/sentinel-3/](https://registry.opendata.aws/sentinel-3/) – olci instrument for ocean color
+* tutorials: 
+  * https://carpentries-incubator.github.io/geospatial-python/05-access-data/
+  * https://github.com/Sentinel-5P/data-on-s3/blob/master/notebooks/Sentinel3_Tutorial.ipynb
+  * https://www.matecdev.com/posts/landsat-sentinel-aws-s3-python.html
 * Compare sentinel and modis/aqua retrievals?
-* [https://sentinels.copernicus.eu/web/sentinel/technical-guides/sentinel-3-olci/level-2/ocean-processing](https://sentinels.copernicus.eu/web/sentinel/technical-guides/sentinel-3-olci/level-2/ocean-processing)
-* https://www.matecdev.com/posts/landsat-sentinel-aws-s3-python.html
 * NASA modis
   * https://oceancolor.gsfc.nasa.gov/data/download_methods/
   * https://github.com/OceanOptics/getOC
-* Algorithms:  https://oceancolor.gsfc.nasa.gov/atbd/
-  * 
+* Algorithms: 
+  * Modis: https://oceancolor.gsfc.nasa.gov/atbd/
+  * Sentinel: https://sentinels.copernicus.eu/web/sentinel/technical-guides/sentinel-3-olci/level-2/ocean-processing
+  
 
 
 
