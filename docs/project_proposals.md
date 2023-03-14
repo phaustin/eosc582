@@ -5,17 +5,7 @@ jupytext:
     format_name: myst
     format_version: 0.13
     jupytext_version: 1.14.5
-kernelspec:
-  display_name: Python 3 (ipykernel)
-  language: python
-  name: python3
 ---
-
-+++ {"user_expressions": []}
-
-
-
-+++ {"user_expressions": []}
 
 # E582 project notes
 
@@ -49,11 +39,7 @@ kernelspec:
 * Dataset:  HLS tiles – how many?  Minimum size?  What band combinations?
 * Sanity check – k-means clustering with scikit learn in 3 dimensions?
 * Corrine user guide: [https://land.copernicus.eu/user-corner/technical-library/clc-product-user-manual](https://land.copernicus.eu/user-corner/technical-library/clc-product-user-manual)  
-* Classifier example: 
-
-+++ {"user_expressions": []}
-
-
+* Classifier example:
 
 +++ {"user_expressions": []}
 
