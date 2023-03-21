@@ -1,7 +1,6 @@
 #https://corteva.github.io/rioxarray/stable/examples/reproject_match.html
 
 from cluster_sat_data import fetch_data
-from copern_data import plot_classified_data_v2
 import matplotlib.pyplot as plt
 import numpy as np
 import rioxarray

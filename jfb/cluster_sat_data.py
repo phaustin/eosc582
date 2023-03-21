@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 import rioxarray
 from shapely.geometry import Point
 from pystac_client import Client
+import plotly.express as px
 
 import os
 os.environ["GDAL_HTTP_COOKIEFILE"] = "./cookies.txt"
@@ -76,13 +77,15 @@ class ClusteredBands:
         self.s_scores = []
         self.inertia_scores = []
     
-    def set_raster_stack(self, colors):
+    def set_raster_stack(self, colors, copern_xarray):
         band_list = []
         for image in self.rasters:
             for color in colors:
                 june14_band = rioxarray.open_rasterio(image.assets[color].href, masked=True)
-                june14_raster = june14_band.squeeze()
-                june14_raster = june14_raster*june14_band.scale_factor
+                june14_band_match = june14_band.rio.reproject_match(copern_xarray)
+
+                june14_raster = june14_band_match.squeeze()
+                june14_raster = june14_raster*june14_band_match.scale_factor
 
                 band = june14_raster
                 band = np.nan_to_num(band)
@@ -126,15 +129,23 @@ class ClusteredBands:
         return s_score
         
     def show_clustered(self):
+        figures = []
+        images = []
         for idx, no_of_clust in enumerate(self.no_of_ranges):
             title = 'Number of clusters: ' + str(no_of_clust)
             image = self.predicted_rasters[idx]
+            fig = px.imshow(image)
+            """
             plt.figure(figsize = (15,15))
             plt.axis('off')
             plt.title(title)
             plt.imshow(image, cmap='Accent')
             plt.colorbar()
             plt.show()
+            """
+            figures.append(fig)
+            images.append(image)
+        return figures, images
             
     def show_inertia(self):
         plt.figure(figsize = (10,10))
@@ -149,18 +160,18 @@ class ClusteredBands:
         plt.show
 
 
-def run_clustering(n_clusters_range):
-    scene = fetch_data(lat=49.2827, lon=-123.120, date="2015-06-01/2015-06-30")
+def run_clustering(lat, lon, n_clusters_range, copern_xarray):
+    scene = fetch_data(lat=lat, lon=lon, date="2015-06-01/2015-06-30")
 
     bands = [idx for idx in scene.assets.keys() if idx[0]=="B"] #all bands
     #bands = ["B07", "B06", "B04"]
 
     clustered_models = ClusteredBands(scene)
-    clustered_models.set_raster_stack(bands)
+    clustered_models.set_raster_stack(bands, copern_xarray)
 
     clustered_models.build_models(n_clusters_range)
-    cluster_figures = clustered_models.show_clustered(ax)
+    cluster_figures, images = clustered_models.show_clustered()
     #clustered_models.show_inertia()
     #clustered_models.show_silhouette_scores()
 
-    return cluster_figures
+    return cluster_figures[0], images[0]
