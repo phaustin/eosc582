@@ -7,6 +7,7 @@ import numpy as np
 from plotly.subplots import make_subplots
 import rioxarray
 import plotly.graph_objects as go
+import plotly.express as px
 
 def plot_side_by_side(lat, lon, n_clusters):
     copern_xarray = get_copern_xarray(lat, lon)
@@ -18,13 +19,21 @@ def plot_side_by_side(lat, lon, n_clusters):
     fig = make_subplots(cols=2)
     fig.add_trace(cluster_fig["data"][0], row=1, col=1)
     fig.add_trace(classified_fig["data"][0], row=1, col=2)
+    
+    _, cat_to_mean = get_feature_dict(copern_xarray)
+    fig.update_coloraxes(
+        colorscale=px.colors.qualitative.Dark24,
+        colorbar_tickvals=list(cat_to_mean.keys()),
+        colorbar_ticktext=list(cat_to_mean.values()),
+        colorbar_tickmode="array",
+        )
 
     fig.show()
 
     calc_cluster_composition(copern_xarray.squeeze(), cluster_xarray)
 
 def calc_cluster_composition(copern_xarray, sat_array):
-    feature_dict = get_feature_dict(copern_xarray)
+    feature_dict, _ = get_feature_dict(copern_xarray)
 
     n_sat = len(np.unique(sat_array))
     cats = np.unique(copern_xarray.values)

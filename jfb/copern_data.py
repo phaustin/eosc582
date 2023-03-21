@@ -32,7 +32,7 @@ def get_feature_dict(band_xarray):
     val_to_cat = dict(zip(flag_values, cat))
     cat_to_mean = dict(zip(cat, flag_meanings))
     val_to_mean = dict(zip(flag_values, flag_meanings))
-    return val_to_mean
+    return val_to_mean, cat_to_mean
 
 def plot_classified_data(band_xarray):
     #the_tif  = "./data/copernicus/PROBAV_LC100_global_v3.0.1_2019-nrt_Discrete-Classification-map_EPSG-4326.tif"
