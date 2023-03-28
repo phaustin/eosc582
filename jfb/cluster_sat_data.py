@@ -32,64 +32,42 @@ def fetch_data(lat, lon, date):
 
     items = search.get_all_items()
 
-    scene = items[1]
+    min_cloud_cover = 100
+    for index, the_scene in enumerate(items):
+        cloud_cover = the_scene.properties["eo:cloud_cover"]
+        if cloud_cover < min_cloud_cover:
+            scene = items[index]
+            min_cloud_cover = cloud_cover
 
     return scene
-
-
-def show_rgb(scenes_list, red="B04", green="B03", blue="B02"):
-    stack = []
-    
-    colors = [red, green, blue]
-    #colors = ['B0' + str(x) for x in colors]
-    for scene in scenes_list:
-        for color in colors:
-            june14_band = rioxarray.open_rasterio(scene.assets[color].href, masked=True)
-            june14_raster = june14_band.squeeze()
-            june14_raster = june14_raster*june14_band.scale_factor
-            stack.append(june14_raster)
-    
-    stack = np.dstack(stack)
-    
-    for i in range(0, 3):
-        stack[:, :, i] = equalize_adapthist(stack[:, :, i], clip_limit=0.025)
-        
-    fig = plt.figure(figsize=(15,15))
-    plt.axis('off')
-    
-    #print(stack)
-    
-    plt.imshow(stack)
-    return fig
-#show_rgb(complete_dataset)
 
 class ClusteredBands:
     
     def __init__(self, scene):
-        self.rasters = [scene]
+        self.scene = scene
         self.model_input = None
         self.width = 0
         self.height = 0
         self.depth = 0
-        self.no_of_ranges = None
-        self.models = None
-        self.predicted_rasters = None
-        self.s_scores = []
-        self.inertia_scores = []
+        self.n_clusters = None
+        self.model = None
+        self.predicted_raster = None
+        self.s_score = None
+        self.inertia_score = None
     
     def set_raster_stack(self, colors, copern_xarray):
+        fmask = rioxarray.open_rasterio(self.scene.assets["Fmask"].href, masked=True)
+        fmask_match = (fmask).rio.reproject_match(copern_xarray)
+
         band_list = []
-        for image in self.rasters:
-            for color in colors:
-                june14_band = rioxarray.open_rasterio(image.assets[color].href, masked=True)
-                june14_band_match = june14_band.rio.reproject_match(copern_xarray)
+        for color in colors:
+            band = rioxarray.open_rasterio(self.scene.assets[color].href, masked=True)
+            #https://corteva.github.io/rioxarray/stable/examples/reproject_match.html
+            band_match = band.rio.reproject_match(copern_xarray)
 
-                june14_raster = june14_band_match.squeeze()
-                june14_raster = june14_raster*june14_band_match.scale_factor
+            raster = (band_match*fmask_match).squeeze()*band_match.scale_factor
 
-                band = june14_raster
-                band = np.nan_to_num(band)
-                band_list.append(band)
+            band_list.append(np.nan_to_num(raster))
         bands_stack = np.dstack(band_list)
         
         # Prepare model input from bands stack
@@ -97,81 +75,38 @@ class ClusteredBands:
         self.model_input = bands_stack.reshape(self.width * self.height, self.depth)
             
             
-    def build_models(self, no_of_clusters_range):
-        self.no_of_ranges = no_of_clusters_range
-        models = []
-        predicted = []
-        inertia_vals = []
-        s_scores = []
-        for n_clust in no_of_clusters_range:
-            kmeans = KMeans(n_clusters=n_clust)
-            y_pred = kmeans.fit_predict(self.model_input)
-            
-            # Append model
-            models.append(kmeans)
-            
-            # Calculate metrics
-            s_scores.append(self._calc_s_score(y_pred))
-            inertia_vals.append(kmeans.inertia_)
-            
-            # Append output image (classified)
-            quantized_raster = np.reshape(y_pred, (self.width, self.height))
-            predicted.append(quantized_raster)
-            
-        # Update class parameters
-        self.models = models
-        self.predicted_rasters = predicted
-        self.s_scores = s_scores
-        self.inertia_scores = inertia_vals
+    def build_models(self, n_clusters):
+        self.n_clusters = n_clusters
+        
+        kmeans = KMeans(n_clusters=n_clusters)
+        y_pred = kmeans.fit_predict(self.model_input)
+        
+        self.model = kmeans
+        self.s_score = self._calc_s_score(y_pred)
+        self.inertia_val = kmeans.inertia_
+        self.predicted_raster = np.reshape(y_pred, (self.width, self.height))
         
     def _calc_s_score(self, labels):
         s_score = silhouette_score(self.model_input, labels, sample_size=1000)
         return s_score
         
     def show_clustered(self):
-        figures = []
-        images = []
-        for idx, no_of_clust in enumerate(self.no_of_ranges):
-            title = 'Number of clusters: ' + str(no_of_clust)
-            image = self.predicted_rasters[idx]
-            fig = px.imshow(image)
-            """
-            plt.figure(figsize = (15,15))
-            plt.axis('off')
-            plt.title(title)
-            plt.imshow(image, cmap='Accent')
-            plt.colorbar()
-            plt.show()
-            """
-            figures.append(fig)
-            images.append(image)
-        return figures, images
-            
-    def show_inertia(self):
-        plt.figure(figsize = (10,10))
-        plt.title('Inertia of the models')
-        plt.plot(self.no_of_ranges, self.inertia_scores)
-        plt.show()
-        
-    def show_silhouette_scores(self):
-        plt.figure(figsize = (10,10))
-        plt.title('Silhouette scores')
-        plt.plot(self.no_of_ranges, self.s_scores)
-        plt.show
+        title = 'Number of clusters: ' + str(self.n_clusters)
+        image = self.predicted_raster
+        fig = px.imshow(image)
+        return fig, image
 
 
-def run_clustering(lat, lon, n_clusters_range, copern_xarray):
-    scene = fetch_data(lat=lat, lon=lon, date="2015-06-01/2015-06-30")
+def run_clustering(lat, lon, date, algorithm, n_clusters, bands, xarray):
+    scene = fetch_data(lat=lat, lon=lon, date=date)
 
-    bands = [idx for idx in scene.assets.keys() if idx[0]=="B"] #all bands
-    #bands = ["B07", "B06", "B04"]
+    if bands == "all":
+        bands = [idx for idx in scene.assets.keys() if idx[0]=="B"]
 
     clustered_models = ClusteredBands(scene)
-    clustered_models.set_raster_stack(bands, copern_xarray)
+    clustered_models.set_raster_stack(bands, xarray)
 
-    clustered_models.build_models(n_clusters_range)
-    cluster_figures, images = clustered_models.show_clustered()
-    #clustered_models.show_inertia()
-    #clustered_models.show_silhouette_scores()
+    clustered_models.build_models(n_clusters)
+    cluster_figure, image = clustered_models.show_clustered()
 
-    return cluster_figures[0], images[0]
+    return cluster_figure, image

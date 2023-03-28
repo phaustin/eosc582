@@ -8,11 +8,12 @@ from plotly.subplots import make_subplots
 import rioxarray
 import plotly.graph_objects as go
 import plotly.express as px
+import json
 
-def plot_side_by_side(lat, lon, n_clusters):
-    copern_xarray = get_copern_xarray(lat, lon)
-
-    cluster_fig, cluster_xarray = run_clustering(lat=49.2827, lon=-123.120, n_clusters_range=[n_clusters], copern_xarray=copern_xarray)
+def plot_side_by_side(lat, lon, date, size=0.25, algorithm="knn", n_clusters=3, bands="all"):
+    # need to pass copern_array to clustering to align the projections
+    copern_xarray = get_copern_xarray(lat, lon, size)
+    cluster_fig, cluster_xarray = run_clustering(lat=lat, lon=lon, date=date, algorithm=algorithm, n_clusters=n_clusters, bands=bands, xarray=copern_xarray)
 
     classified_fig = plot_classified_data(copern_xarray)
 
@@ -30,7 +31,42 @@ def plot_side_by_side(lat, lon, n_clusters):
 
     fig.show()
 
-    calc_cluster_composition(copern_xarray.squeeze(), cluster_xarray)
+    composition_dict = calc_cluster_composition(copern_xarray.squeeze(), cluster_xarray)
+
+    #plot pie plots
+    for i in range(n_sat):
+        percent_comps = composition_dict["cluster_" + str(i)]
+
+        fig = go.Figure(data=[go.Pie(labels=list(percent_comps.keys()), values=list(percent_comps.values()))])
+        fig.show()
+
+def save_cluster(lat, lon, date, size=0.25, algorithm="knn", n_clusters=3, bands="all"):
+    # need to pass copern_array to clustering to align the projections
+    copern_xarray = get_copern_xarray(lat, lon, size)
+    cluster_fig, cluster_xarray = run_clustering(lat=lat, lon=lon, date=date, algorithm=algorithm, n_clusters=n_clusters, bands=bands, xarray=copern_xarray)
+    composition_dict = calc_cluster_composition(copern_xarray.squeeze(), cluster_xarray)
+
+    cluster_dict = {
+        "lat": lat,
+        "lon": lon,
+        "date": date,
+        "size": size,
+        "algorithm": algorithm,
+        "n_clusters": n_clusters,
+        "bands": bands,
+        "composition_dict": composition_dict
+    }
+
+    # add dict to json
+    with open("cluster_data.json",'r+') as file:
+        # First we load existing data into a dict.
+        file_data = json.load(file)
+        # Join new_data with file_data inside emp_details
+        file_data["data"].append(cluster_dict)
+        # Sets file's current position at offset.
+        file.seek(0)
+        # convert back to json.
+        json.dump(file_data, file, indent = 4)
 
 def calc_cluster_composition(copern_xarray, sat_array):
     feature_dict, _ = get_feature_dict(copern_xarray)
@@ -48,11 +84,7 @@ def calc_cluster_composition(copern_xarray, sat_array):
             percent_comp = np.sum(copern_xarray.values[inds] == j)/n_cluster_values
             composition_dict["cluster_" + str(i)][feature_dict[j]] = percent_comp
 
-    for i in range(n_sat):
-        percent_comps = composition_dict["cluster_" + str(i)]
-
-        fig = go.Figure(data=[go.Pie(labels=list(percent_comps.keys()), values=list(percent_comps.values()))])
-        fig.show()
+    return composition_dict
 
 
 
