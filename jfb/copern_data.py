@@ -1,3 +1,5 @@
+# Read in classified data.
+
 import rioxarray
 import cartopy
 from matplotlib import pyplot as plt

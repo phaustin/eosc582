@@ -1,3 +1,4 @@
+# Fetch and cluster satellite data.
 #https://ml-gis-service.com/index.php/2020/10/14/data-science-unsupervised-classification-of-satellite-images-with-k-means-algorithm/
 
 import os
@@ -11,6 +12,7 @@ import rioxarray
 from shapely.geometry import Point
 from pystac_client import Client
 import plotly.express as px
+from sklearn.cluster import DBSCAN
 
 import os
 os.environ["GDAL_HTTP_COOKIEFILE"] = "./cookies.txt"
@@ -75,17 +77,23 @@ class ClusteredBands:
         self.model_input = bands_stack.reshape(self.width * self.height, self.depth)
             
             
-    def build_models(self, n_clusters):
+    def build_models(self, algorithm, n_clusters):
         self.n_clusters = n_clusters
         
-        kmeans = KMeans(n_clusters=n_clusters)
-        y_pred = kmeans.fit_predict(self.model_input)
+        if algorithm == "knn":
+            kmeans = KMeans(n_clusters=n_clusters)
+            y_pred = kmeans.fit_predict(self.model_input)            
+            self.model = kmeans
+            self.s_score = self._calc_s_score(y_pred)
+            self.inertia_val = kmeans.inertia_
+        elif algorithm == "dbscan":
+            dbscan = DBSCAN()
+            dbscan.fit_predict(self.model_input)
+            y_pred = dbscan.labels_
+            self.model = dbscan
         
-        self.model = kmeans
-        self.s_score = self._calc_s_score(y_pred)
-        self.inertia_val = kmeans.inertia_
         self.predicted_raster = np.reshape(y_pred, (self.width, self.height))
-        
+
     def _calc_s_score(self, labels):
         s_score = silhouette_score(self.model_input, labels, sample_size=1000)
         return s_score
@@ -102,11 +110,13 @@ def run_clustering(lat, lon, date, algorithm, n_clusters, bands, xarray):
 
     if bands == "all":
         bands = [idx for idx in scene.assets.keys() if idx[0]=="B"]
+    elif bands == "false_colour":
+        bands = ["B06", "B05", "B04"]
 
     clustered_models = ClusteredBands(scene)
     clustered_models.set_raster_stack(bands, xarray)
 
-    clustered_models.build_models(n_clusters)
+    clustered_models.build_models(algorithm, n_clusters)
     cluster_figure, image = clustered_models.show_clustered()
 
     return cluster_figure, image

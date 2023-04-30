@@ -31,7 +31,8 @@ def plot_side_by_side(lat, lon, date, size=0.25, algorithm="knn", n_clusters=3, 
 
     fig.show()
 
-    composition_dict = calc_cluster_composition(copern_xarray.squeeze(), cluster_xarray)
+    composition_dict, _, n_sat = calc_cluster_composition(copern_xarray.squeeze(), cluster_xarray)
+    print(composition_dict)
 
     #plot pie plots
     for i in range(n_sat):
@@ -44,7 +45,7 @@ def save_cluster(lat, lon, date, size=0.25, algorithm="knn", n_clusters=3, bands
     # need to pass copern_array to clustering to align the projections
     copern_xarray = get_copern_xarray(lat, lon, size)
     cluster_fig, cluster_xarray = run_clustering(lat=lat, lon=lon, date=date, algorithm=algorithm, n_clusters=n_clusters, bands=bands, xarray=copern_xarray)
-    composition_dict = calc_cluster_composition(copern_xarray.squeeze(), cluster_xarray)
+    composition_dict, n_cats, _ = calc_cluster_composition(copern_xarray.squeeze(), cluster_xarray)
 
     cluster_dict = {
         "lat": lat,
@@ -54,6 +55,7 @@ def save_cluster(lat, lon, date, size=0.25, algorithm="knn", n_clusters=3, bands
         "algorithm": algorithm,
         "n_clusters": n_clusters,
         "bands": bands,
+        "n_cats": n_cats,
         "composition_dict": composition_dict
     }
 
@@ -84,7 +86,7 @@ def calc_cluster_composition(copern_xarray, sat_array):
             percent_comp = np.sum(copern_xarray.values[inds] == j)/n_cluster_values
             composition_dict["cluster_" + str(i)][feature_dict[j]] = percent_comp
 
-    return composition_dict
+    return composition_dict, n_cats, n_sat
 
 
 
