@@ -35,11 +35,9 @@ def plot_saved_data():
                 for material, percent in cluster_dict.items():
                     if percent > 0.8 and material != "built-up":
                         good_clusters += 1
-            #plt.scatter(data_dict[x[i]], good_clusters)
             ind = np.where(x_labels[i] == data_dict[x[i]])
             x_data[i][good_clusters, ind] += 1
     
-    #plt.show()
     for i in range(len(x_data)):
         fig=go.Figure(data=go.Heatmap(
             x=x_labels[i],
@@ -48,14 +46,7 @@ def plot_saved_data():
             colorscale = 'Viridis'
             )
         )
-        fig.update_layout(title=x[i])
+        fig.update_layout(title="effect of changing " + str(x[i]), xaxis_title=x[i], yaxis_title="number of good clusters")
         fig.show()
-
-        #plt.subplot(2, 2, i+1)
-        #plt.imshow(x_data[i])
-        #plt.colorbar()
-    
-    #plt.tight_layout()
-    #plt.show()
 
     f.close()

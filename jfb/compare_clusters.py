@@ -17,7 +17,7 @@ def plot_side_by_side(lat, lon, date, size=0.25, algorithm="knn", n_clusters=3, 
 
     classified_fig = plot_classified_data(copern_xarray)
 
-    fig = make_subplots(cols=2)
+    fig = make_subplots(cols=2, subplot_titles=("Clustered", "Classified"))
     fig.add_trace(cluster_fig["data"][0], row=1, col=1)
     fig.add_trace(classified_fig["data"][0], row=1, col=2)
     
@@ -32,13 +32,13 @@ def plot_side_by_side(lat, lon, date, size=0.25, algorithm="knn", n_clusters=3, 
     fig.show()
 
     composition_dict, _, n_sat = calc_cluster_composition(copern_xarray.squeeze(), cluster_xarray)
-    print(composition_dict)
 
     #plot pie plots
     for i in range(n_sat):
         percent_comps = composition_dict["cluster_" + str(i)]
 
         fig = go.Figure(data=[go.Pie(labels=list(percent_comps.keys()), values=list(percent_comps.values()))])
+        fig.update_layout(title="Cluster " + str(i) + " composition")
         fig.show()
 
 def save_cluster(lat, lon, date, size=0.25, algorithm="knn", n_clusters=3, bands="all"):

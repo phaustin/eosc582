@@ -74,10 +74,8 @@ def get_raster_stack(lat, lon, date, colors, copern_xarray):
 lat = 49.2827
 lon = -123.120
 size = 0.25
-#size = 0.05
 band_combinations = ["all", "false_colour"]
 colors = band_combinations[0]
-#colors = band_combinations[1]
 # jan, apr, july, oct
 date_combinations = ["2019-01-01/2019-01-31", "2019-04-01/2019-04-30", "2019-07-01/2019-07-31", "2019-10-01/2019-10-31"]
 date = date_combinations[2]
@@ -88,4 +86,4 @@ y_data = np.squeeze(get_copern_xarray(lat, lon, size))
 # Data
 arr_st = get_raster_stack(lat, lon, date, colors, y_data)
 
-np.save("arr_st.npy", arr_st)
+np.save("arr_st_50.npy", arr_st)
